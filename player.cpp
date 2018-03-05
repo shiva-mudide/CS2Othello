@@ -50,15 +50,16 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
     //how can I make this check the side of the opponent instead of 
     // hardcoding "WHITE?"
 
-    Move* playerMove = new Move(0, 0);
+    Move *playerMove = new Move(0, 0);
 
-    for (int i = 0; i < 8; i++){
-        for (int j = 0; j < 8; j++){
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
             playerMove -> setX(i);
             playerMove -> setY(j);
-            if (playerBoard -> checkMove(playerMove, BLACK)){
+            if (playerBoard -> checkMove(playerMove, BLACK)) {
                 playerBoard -> doMove(playerMove, BLACK);
-                return playerMove;}
+                return playerMove;
+            }
         }
 
     }
