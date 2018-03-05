@@ -17,6 +17,8 @@ Player::Player(Side side) {
      * precalculating things, etc.) However, remember that you will only have
      * 30 seconds.
      */
+
+    playerBoard = new Board();
 }
 
 /*
@@ -44,6 +46,22 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      * process the opponent's opponents move before calculating your own move
      */
 
-	
+    
+
+    playerBoard -> doMove(opponentsMove, WHITE);
+    Move* playerMove = new Move(0, 0);
+
+    for (int i = 0; i < 8; i++){
+        for (int j = 0; j < 8; j++){
+            playerMove -> setX(i);
+            playerMove -> setY(j);
+            if (playerBoard -> checkMove(playerMove, BLACK)){
+                playerBoard -> doMove(playerMove, BLACK);
+                return playerMove;}
+        }
+
+    }
+
+	delete playerMove;
     return nullptr;
 }
