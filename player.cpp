@@ -46,9 +46,10 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      * process the opponent's opponents move before calculating your own move
      */
 
-    
+    playerBoard -> doMove(opponentsMove, WHITE); 
+    //how can I make this check the side of the opponent instead of 
+    // hardcoding "WHITE?"
 
-    playerBoard -> doMove(opponentsMove, WHITE);
     Move* playerMove = new Move(0, 0);
 
     for (int i = 0; i < 8; i++){
@@ -62,6 +63,6 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 
     }
 
-	delete playerMove;
+    delete playerMove;
     return nullptr;
 }
