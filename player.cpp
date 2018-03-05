@@ -1,5 +1,7 @@
 #include "player.hpp"
 
+// Hi, my name is James.
+
 /*
  * Constructor for the player; initialize everything here. The side your AI is
  * on (BLACK or WHITE) is passed in as "side". The constructor must finish
