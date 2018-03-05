@@ -1,6 +1,7 @@
 #include "player.hpp"
 
 // Hi, my name is James.
+// Hi, my name is Shiva. 
 
 /*
  * Constructor for the player; initialize everything here. The side your AI is
@@ -43,6 +44,6 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      * process the opponent's opponents move before calculating your own move
      */
 
-	int x = 2; 
+	
     return nullptr;
 }
