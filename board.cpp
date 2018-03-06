@@ -67,6 +67,69 @@ bool Board::hasMoves(Side side) {
     return false;
 }
 
+
+int Board::boardScore(Move* m) {
+
+    int score = countBlack() - countWhite();
+ /*   
+    if ( (m -> getX() == 0 && m -> getY() == 0) || (m -> getX() == 0 && m -> getY() == 7) || 
+        (m -> getX() == 7 && m -> getY() == 0) || (m -> getX() == 7 && m -> getY() == 7)){
+        
+            score = score * 3;
+    }
+
+    else if ( (m -> getX() == 1 && m -> getY() == 1) || (m -> getX() == 6 && m -> getY() == 1) || 
+        (m -> getX() == 1 && m -> getY() == 6) || (m -> getX() == 6 && m -> getY() == 6)){
+       // if (score >= 0)
+            score = score * -3;
+       // else score = score * 3;
+    }
+
+    return score; 
+}
+*/
+
+
+    if (m->getX() == 0 || m->getX() == 7){
+        if(m->getY() == 0 || m->getY() == 7){
+            score = score * 3;
+            return score;
+        }
+        if(m->getY() == 1 || m->getY() == 6){
+            score = score * -2;
+            return score;
+
+        }
+
+        score = score * 2; 
+        return score;
+    }
+
+    if (m->getY() == 0 || m->getY() == 7){
+        if(m->getX() == 1 || m->getX() == 6){
+            score = score * -2;
+            return score;
+        }
+
+        score = score * 2;
+        return score;
+
+    }
+
+    if ( (m -> getX() == 1 && m -> getY() == 1) || (m -> getX() == 6 && m -> getY() == 1) || 
+        (m -> getX() == 1 && m -> getY() == 6) || (m -> getX() == 6 && m -> getY() == 6)){
+        
+        score = score * -3;
+        return score;
+    }
+
+    return score; 
+}
+
+
+
+
+
 /*
  * Returns true if a move is legal for the given side; false otherwise.
  */

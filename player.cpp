@@ -46,7 +46,8 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      * process the opponent's opponents move before calculating your own move
      */
 
-    playerBoard -> doMove(opponentsMove, WHITE); 
+/*
+     playerBoard -> doMove(opponentsMove, WHITE); 
     //how can I make this check the side of the opponent instead of 
     // hardcoding "WHITE?"
 
@@ -65,4 +66,48 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 
     delete playerMove;
     return nullptr;
+*/
+
+    playerBoard -> doMove(opponentsMove, WHITE); 
+    //how can I make this check the side of the opponent instead of 
+    // hardcoding "WHITE?"
+
+    Move* playerMove = new Move(0, 0);
+    Move* tempMove = new Move(0,0);
+    int score = -1000;
+    bool changed = false;
+
+    for (int x = 0; x < 8; x++) {
+        for (int y = 0; y < 8; y++) {
+            tempMove -> setX(x);
+            tempMove -> setY(y);
+
+            if (playerBoard -> checkMove(tempMove, BLACK)) {
+                changed = true;
+
+                Board* copyBoard = playerBoard -> copy();
+                copyBoard -> doMove(tempMove, BLACK);
+
+                if (copyBoard -> boardScore(tempMove) > score) {
+                    score = copyBoard -> boardScore(tempMove);
+                    playerMove -> setX(tempMove -> getX());
+                    playerMove -> setY(tempMove -> getY());
+                }
+
+                delete copyBoard;
+            }
+        }
+    }
+
+    if (changed == false) {
+        delete tempMove;
+        delete playerMove;
+        return nullptr;
+    }
+    
+    delete tempMove; 
+    playerBoard -> doMove(playerMove, BLACK);
+    return playerMove;
+
+   
 }
