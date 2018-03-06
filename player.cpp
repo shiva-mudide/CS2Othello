@@ -33,28 +33,10 @@ Player::~Player() {
 }
 
 /*
- * Compute the next move given the opponent's last move. Your AI is
- * expected to keep track of the board on its own. If this is the first move,
- * or if the opponent passed on the last move, then opponentsMove will be
- * nullptr.
- *
- * msLeft represents the time your AI has left for the total game, in
- * milliseconds. doMove() must take no longer than msLeft, or your AI will
- * be disqualified! An msLeft value of -1 indicates no time limit.
- *
- * The move returned must be legal; if there are no valid moves for your side,
- * return nullptr.
+ * Implementation of a working AI that plays the first move it finds that is valid.
  */
-Move *Player::doMove(Move *opponentsMove, int msLeft) {
-    /*
-     * TODO: Implement how moves your AI should play here. You should first
-     * process the opponent's opponents move before calculating your own move
-     */
-
-/*
-     playerBoard -> doMove(opponentsMove, WHITE); 
-    //how can I make this check the side of the opponent instead of 
-    // hardcoding "WHITE?"
+Move *random_AI(Move *opponentsMove) {
+	playerBoard -> doMove(opponentsMove, playerSide); 
 
     Move *playerMove = new Move(0, 0);
 
@@ -62,8 +44,8 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
         for (int j = 0; j < 8; j++) {
             playerMove -> setX(i);
             playerMove -> setY(j);
-            if (playerBoard -> checkMove(playerMove, BLACK)) {
-                playerBoard -> doMove(playerMove, BLACK);
+            if (playerBoard -> checkMove(playerMove, oppoSide)) {
+                playerBoard -> doMove(playerMove, oppoSide);
                 return playerMove;
             }
         }
@@ -72,11 +54,14 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 
     delete playerMove;
     return nullptr;
-*/
+}
 
-    playerBoard -> doMove(opponentsMove, oppoSide); 
-    //how can I make this check the side of the opponent instead of 
-    // hardcoding "WHITE?"
+/*
+ * Simple heuristic AI that is good enough to beat SimplePlayer. Plays the move that gets the
+ * maximum score with only a depth level of 1.
+ */
+Move *heuristic_AI(Move *opponentsMove) {
+	playerBoard -> doMove(opponentsMove, oppoSide); 
 
     Move* playerMove = new Move(0, 0);
     Move* tempMove = new Move(0,0);
@@ -114,6 +99,26 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
     delete tempMove; 
     playerBoard -> doMove(playerMove, playerSide);
     return playerMove;
+}
 
-   
+/*
+ * Compute the next move given the opponent's last move. Your AI is
+ * expected to keep track of the board on its own. If this is the first move,
+ * or if the opponent passed on the last move, then opponentsMove will be
+ * nullptr.
+ *
+ * msLeft represents the time your AI has left for the total game, in
+ * milliseconds. doMove() must take no longer than msLeft, or your AI will
+ * be disqualified! An msLeft value of -1 indicates no time limit.
+ *
+ * The move returned must be legal; if there are no valid moves for your side,
+ * return nullptr.
+ */
+Move *Player::doMove(Move *opponentsMove, int msLeft) {
+    /*
+     * TODO: Implement how moves your AI should play here. You should first
+     * process the opponent's opponents move before calculating your own move
+     */
+
+	return minimax_AI(opponentsMove);   
 }
