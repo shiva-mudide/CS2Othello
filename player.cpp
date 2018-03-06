@@ -36,9 +36,7 @@ Player::~Player() {
  * Implementation of a working AI that plays the first move it finds that is valid.
  */
 Move *random_AI(Move *opponentsMove) {
-	playerBoard -> doMove(opponentsMove, playerSide); 
-
-    Move *playerMove = new Move(0, 0);
+	Move *playerMove = new Move(0, 0);
 
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
@@ -61,9 +59,7 @@ Move *random_AI(Move *opponentsMove) {
  * maximum score with only a depth level of 1.
  */
 Move *heuristic_AI(Move *opponentsMove) {
-	playerBoard -> doMove(opponentsMove, oppoSide); 
-
-    Move* playerMove = new Move(0, 0);
+	Move* playerMove = new Move(0, 0);
     Move* tempMove = new Move(0,0);
     int score = -1000;
     bool changed = false;
@@ -101,6 +97,10 @@ Move *heuristic_AI(Move *opponentsMove) {
     return playerMove;
 }
 
+Move *minimax_AI(Move *opponentsMove) {
+	
+}
+
 /*
  * Compute the next move given the opponent's last move. Your AI is
  * expected to keep track of the board on its own. If this is the first move,
@@ -120,5 +120,6 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      * process the opponent's opponents move before calculating your own move
      */
 
+	playerBoard -> doMove(opponentsMove, oppoSide);
 	return minimax_AI(opponentsMove);   
 }
