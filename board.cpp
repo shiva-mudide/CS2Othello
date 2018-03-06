@@ -68,9 +68,9 @@ bool Board::hasMoves(Side side) {
 }
 
 
-int Board::boardScore(Move* m) {
+int Board::boardScore(Move* m, Side side) {
 
-    int score = countBlack() - countWhite();
+    int score = playerCount(side) - oppoCount(side);
  /*   
     if ( (m -> getX() == 0 && m -> getY() == 0) || (m -> getX() == 0 && m -> getY() == 7) || 
         (m -> getX() == 7 && m -> getY() == 0) || (m -> getX() == 7 && m -> getY() == 7)){
@@ -207,8 +207,12 @@ void Board::doMove(Move *m, Side side) {
 /*
  * Current count of given side's stones.
  */
-int Board::count(Side side) {
+int Board::playerCount(Side side) {
     return (side == BLACK) ? countBlack() : countWhite();
+}
+
+int Board::oppoCount(Side side) {
+    return (side == BLACK) ? countWhite() : countBlack();
 }
 
 /*

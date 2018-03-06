@@ -10,6 +10,7 @@ class Player {
 
 private:
 	Board* playerBoard;
+	Side playerSide, oppoSide; 
 
 public:
     Player(Side side);

@@ -11,6 +11,11 @@
 Player::Player(Side side) {
     // Will be set to true in test_minimax.cpp.
     testingMinimax = false;
+    playerSide = side;
+    oppoSide = (playerSide == BLACK ? WHITE : BLACK);
+
+
+
 
     /*
      * TODO: Do any initialization you need to do here (setting up the board,
@@ -69,7 +74,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
     return nullptr;
 */
 
-    playerBoard -> doMove(opponentsMove, WHITE); 
+    playerBoard -> doMove(opponentsMove, oppoSide); 
     //how can I make this check the side of the opponent instead of 
     // hardcoding "WHITE?"
 
@@ -83,14 +88,14 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
             tempMove -> setX(x);
             tempMove -> setY(y);
 
-            if (playerBoard -> checkMove(tempMove, BLACK)) {
+            if (playerBoard -> checkMove(tempMove, playerSide)) {
                 changed = true;
 
                 Board* copyBoard = playerBoard -> copy();
-                copyBoard -> doMove(tempMove, BLACK);
+                copyBoard -> doMove(tempMove, playerSide);
 
-                if (copyBoard -> boardScore(tempMove) > score) {
-                    score = copyBoard -> boardScore(tempMove);
+                if (copyBoard -> boardScore(tempMove, playerSide) > score) {
+                    score = copyBoard -> boardScore(tempMove, playerSide);
                     playerMove -> setX(tempMove -> getX());
                     playerMove -> setY(tempMove -> getY());
                 }
@@ -107,7 +112,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
     }
     
     delete tempMove; 
-    playerBoard -> doMove(playerMove, BLACK);
+    playerBoard -> doMove(playerMove, playerSide);
     return playerMove;
 
    

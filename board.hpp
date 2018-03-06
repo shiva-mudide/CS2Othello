@@ -23,10 +23,11 @@ public:
 
     bool isDone();
     bool hasMoves(Side side);
-    int boardScore(Move* m);
+    int boardScore(Move* m, Side side);
     bool checkMove(Move *m, Side side);
     void doMove(Move *m, Side side);
-    int count(Side side);
+    int playerCount(Side side);
+    int oppoCount(Side side);
     int countBlack();
     int countWhite();
 
