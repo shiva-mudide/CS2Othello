@@ -98,7 +98,11 @@ Move *heuristic_AI(Move *opponentsMove) {
 }
 
 Move *minimax_AI(Move *opponentsMove) {
-	
+	Move* tempMove = new Move(0,0);
+
+	for (int i = 0; i < 8; i++) {
+		/* code */
+	}
 }
 
 /*
