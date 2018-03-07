@@ -179,5 +179,8 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      */
 
     board -> doMove(opponentsMove, oppoSide);
+    // Uncomment these next three lines, one at a time, to test the respective AI's:
+    // return random_AI(opponentsMove);
+    // return heuristic_AI(opponentsMove);
     return minimax_AI(opponentsMove);   
 }
