@@ -101,6 +101,9 @@ Move *Player::heuristic_AI(Move *opponentsMove) {
     return playerMove;
 }
 
+/*
+ * Minimax AI that only goes to a depth level of 2s
+ */
 Move *Player::minimax_AI(Move *opponentsMove) {
     vector<Move *> firstMove;
 
