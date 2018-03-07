@@ -25,6 +25,7 @@ int main(int argc, char *argv[]) {
     // Initialize player as the white player, and set testing_minimax flag.
     Player *player = new Player(WHITE);
     player->testingMinimax = true;
+    player->change_board(board);
 
 
     /**

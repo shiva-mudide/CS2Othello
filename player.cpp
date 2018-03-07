@@ -23,7 +23,7 @@ Player::Player(Side side) {
      * 30 seconds.
      */
 
-    playerBoard = new Board();
+    board = new Board();
 }
 
 /*
@@ -32,18 +32,22 @@ Player::Player(Side side) {
 Player::~Player() {
 }
 
+void Player::change_board(Board *new_board) {
+    board = new_board;
+}
+
 /*
  * Implementation of a working AI that plays the first move it finds that is valid.
  */
-Move *random_AI(Move *opponentsMove) {
-	Move *playerMove = new Move(0, 0);
+Move *Player::random_AI(Move *opponentsMove) {
+    Move *playerMove = new Move(0, 0);
 
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
             playerMove -> setX(i);
             playerMove -> setY(j);
-            if (playerBoard -> checkMove(playerMove, oppoSide)) {
-                playerBoard -> doMove(playerMove, oppoSide);
+            if (board -> checkMove(playerMove, playerSide)) {
+                board -> doMove(playerMove, playerSide);
                 return playerMove;
             }
         }
@@ -58,8 +62,8 @@ Move *random_AI(Move *opponentsMove) {
  * Simple heuristic AI that is good enough to beat SimplePlayer. Plays the move that gets the
  * maximum score with only a depth level of 1.
  */
-Move *heuristic_AI(Move *opponentsMove) {
-	Move* playerMove = new Move(0, 0);
+Move *Player::heuristic_AI(Move *opponentsMove) {
+    Move* playerMove = new Move(0, 0);
     Move* tempMove = new Move(0,0);
     int score = -1000;
     bool changed = false;
@@ -69,10 +73,10 @@ Move *heuristic_AI(Move *opponentsMove) {
             tempMove -> setX(x);
             tempMove -> setY(y);
 
-            if (playerBoard -> checkMove(tempMove, playerSide)) {
+            if (board -> checkMove(tempMove, playerSide)) {
                 changed = true;
 
-                Board* copyBoard = playerBoard -> copy();
+                Board* copyBoard = board -> copy();
                 copyBoard -> doMove(tempMove, playerSide);
 
                 if (copyBoard -> boardScore(tempMove, playerSide) > score) {
@@ -93,16 +97,68 @@ Move *heuristic_AI(Move *opponentsMove) {
     }
     
     delete tempMove; 
-    playerBoard -> doMove(playerMove, playerSide);
+    board -> doMove(playerMove, playerSide);
     return playerMove;
 }
 
-Move *minimax_AI(Move *opponentsMove) {
-	Move* tempMove = new Move(0,0);
+Move *Player::minimax_AI(Move *opponentsMove) {
+    vector<Move *> firstMove;
 
-	for (int i = 0; i < 8; i++) {
-		/* code */
-	}
+    for (int x = 0; x < 8; x++) {
+        for (int y = 0; y < 8; y++) {
+            Move *tmpMove = new Move(x, y);
+
+            if (board->checkMove(tmpMove, playerSide))
+                firstMove.push_back(tmpMove);
+        }
+    }
+
+    if (firstMove.size() == 0) {
+        return nullptr;
+    }
+
+    vector<int> minScore;
+    
+    for (int i = 0; i < firstMove.size(); i++) {
+        minScore.push_back(10000);
+    }
+
+    for (int i = 0; i < firstMove.size(); i++) {
+        Board* copyBoard = board->copy();
+        copyBoard->doMove(firstMove[i], playerSide);
+
+        for (int x = 0; x < 8; x++) {
+            for (int y = 0; y < 8; y++) {
+                Move *tmpMove = new Move(x,y);
+
+                if (copyBoard->checkMove(tmpMove, oppoSide)) {
+                    Board *copyCopyBoard = copyBoard->copy();
+                    copyCopyBoard->doMove(tmpMove, oppoSide);
+                    
+                    if (copyCopyBoard->boardScore(tmpMove, oppoSide) < minScore[i]) {
+                        minScore[i] = copyCopyBoard->boardScore(tmpMove, oppoSide);
+                    }
+
+                    //delete copyCopyBoard;
+                }
+
+                //delete tmpMove;
+            }
+        }
+
+        //delete copyBoard;
+    }
+
+    int maxMinScoreIndex = 0;
+
+    for (int i = 1; i < minScore.size(); i++) {
+        if (minScore[i] > minScore[maxMinScoreIndex]) {
+            maxMinScoreIndex = i;
+        }
+    }
+
+    board->doMove(firstMove[maxMinScoreIndex], playerSide);
+    return firstMove[maxMinScoreIndex];
 }
 
 /*
@@ -124,6 +180,6 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      * process the opponent's opponents move before calculating your own move
      */
 
-	playerBoard -> doMove(opponentsMove, oppoSide);
-	return minimax_AI(opponentsMove);   
+    board -> doMove(opponentsMove, oppoSide);
+    return minimax_AI(opponentsMove);   
 }

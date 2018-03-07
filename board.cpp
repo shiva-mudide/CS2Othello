@@ -90,7 +90,7 @@ int Board::boardScore(Move* m, Side side) {
 */
 
 
-    if (m->getX() == 0 || m->getX() == 7){
+    /*if (m->getX() == 0 || m->getX() == 7){
         if(m->getY() == 0 || m->getY() == 7){
             score = score * 3;
             return score;
@@ -121,7 +121,7 @@ int Board::boardScore(Move* m, Side side) {
         
         score = score * -3;
         return score;
-    }
+    }*/
 
     return score; 
 }
