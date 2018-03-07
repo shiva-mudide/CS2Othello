@@ -113,15 +113,10 @@ Move *Player::minimax_AI(Move *opponentsMove) {
         }
     }
 
-    if (firstMove.size() == 0) {
+    if (firstMove.size() == 0)
         return nullptr;
-    }
 
-    vector<int> minScore;
-    
-    for (int i = 0; i < firstMove.size(); i++) {
-        minScore.push_back(10000);
-    }
+    vector<int> minScore(firstMove.size(), 1000);
 
     for (int i = 0; i < firstMove.size(); i++) {
         Board* copyBoard = board->copy();
@@ -129,7 +124,7 @@ Move *Player::minimax_AI(Move *opponentsMove) {
 
         for (int x = 0; x < 8; x++) {
             for (int y = 0; y < 8; y++) {
-                Move *tmpMove = new Move(x,y);
+                Move *tmpMove = new Move(x, y);
 
                 if (copyBoard->checkMove(tmpMove, oppoSide)) {
                     Board *copyCopyBoard = copyBoard->copy();
@@ -139,14 +134,14 @@ Move *Player::minimax_AI(Move *opponentsMove) {
                         minScore[i] = copyCopyBoard->boardScore(tmpMove, oppoSide);
                     }
 
-                    //delete copyCopyBoard;
+                    delete copyCopyBoard;
                 }
 
-                //delete tmpMove;
+                delete tmpMove;
             }
         }
 
-        //delete copyBoard;
+        delete copyBoard;
     }
 
     int maxMinScoreIndex = 0;
