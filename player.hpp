@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <thread>
 #include "common.hpp"
 #include "board.hpp"
 using namespace std;
@@ -22,6 +23,7 @@ public:
     Move *heuristic_AI();
     Move *two_ply_minimax_AI();
     Move *n_ply_minimax_AI(int n);
+    long n_ply_minimax_AI_val(Board calcBoard, Move *m, Side side, int depth);
     Move *doMove(Move *opponentsMove, int msLeft);
 
     // Flag to tell if the player is running within the test_minimax context
