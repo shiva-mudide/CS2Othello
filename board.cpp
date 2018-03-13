@@ -70,7 +70,36 @@ bool Board::hasMoves(Side side) {
 
 int Board::boardScore(Side side) {
 
-    int score = playerCount(side) - oppoCount(side);
+// reference: https://github.com/manalikale/Reversi-Game
+
+    int boardPositionalWeight[8][8] =
+    { { 99, -8, 8, 6, 6, 8, -8, 99 },
+      { -8, -24, -4, -3, -3, -4, -24, -8 },
+      { 8, -4, 7, 4, 4, 7, -4, 8 },
+      { 6, -3, 4, 0, 0, 4, -3, 6 },
+      { 6, -3, 4, 0, 0, 4, -3, 6 },
+      { 8, -4, 7, 4, 4, 7, -4, 8 },
+      { -8, -24, -4, -3, -3, -4, -24, -8 },
+      { 99, -8, 8, 6, 6, 8, -8, 99 }
+    };
+
+
+    long score = 0;
+
+    for (int x = 0; x < 8; x++)  {
+            for (int y = 0; y < 8; y++) {
+                    if (this->occupied(x, y)) {
+                            if (this->black[x + 8*y] == side) {
+                                    score += (1 * boardPositionalWeight[x][y]);
+                            }
+                            else {
+                                    score += (-1 * boardPositionalWeight[x][y]);
+                            }
+                    }
+            }
+    }
+
+    return score;
  /*   
     if ( (m -> getX() == 0 && m -> getY() == 0) || (m -> getX() == 0 && m -> getY() == 7) || 
         (m -> getX() == 7 && m -> getY() == 0) || (m -> getX() == 7 && m -> getY() == 7)){
@@ -123,7 +152,7 @@ int Board::boardScore(Side side) {
         return score;
     }*/
 
-    return score; 
+     
 }
 
 

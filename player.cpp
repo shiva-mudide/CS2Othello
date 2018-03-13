@@ -27,7 +27,7 @@ Player::~Player() {
 }
 
 /*
- * change board to a new board given as a parameter
+ * change board to a new board given as a parametpper
  */
 void Player::change_board(Board *new_board) {
     board = new_board;
@@ -207,17 +207,199 @@ int get_score(Board *board, Move *move, Side side) {
 
 /*
  * look ahead n moves to find the best move to do
- * if n is odd, the n-th move is the AI's turn
- * if n is even, the n-th move is the opponent's turn
+ * n should be odd
  */
 Move *Player::n_ply_minimax_AI(int n) {
-    // when n = 1, find the current best move on the board
-    if (n == 1) {
-        return heuristic_AI();
+   
+
+    long bestMoveVal = -10000000;
+    Move *bestMove = new Move(0,0);
+    bool foundBestMove = false;
+    Move *aiMove = new Move(0,0);
+/*
+    bool lastResort = false;
+    Move *lastResortMove = new Move(0,0);
+    bool lastResortCond = false;
+*/
+
+// Store the first allowable move as a last resort if none of the moves offer an optimal score
+/*
+     for (int x = 0; x < 8; x++) {
+        for (int y = 0; y < 8; y++) { 
+            lastResortMove -> setX(x);
+            lastResortMove -> setY(y);
+
+            if (board -> checkMove(lastResortMove, AI_side)) {
+
+                goto algorithm;
+            }
+        }
     }
 
-    return nullptr;
+algorithm:
+
+*/
+    for (int x = 0; x < 8; x++) {
+        for (int y = 0; y < 8; y++) { 
+            aiMove -> setX(x);
+            aiMove -> setY(y);
+
+            if (board -> checkMove(aiMove, AI_side)) {
+                //lastResort = true;
+
+                Board copy = *board;
+                copy.doMove(aiMove, AI_side);
+                long moveVal;
+                moveVal = n_ply_minimax_AI_val(copy, 
+                    aiMove, opp_side, n);
+
+                if (moveVal >= bestMoveVal) {
+                    bestMoveVal = moveVal;
+                    *bestMove = *aiMove; 
+                    foundBestMove = true;
+                }
+
+            }
+        }
+    }
+
+    delete aiMove;
+    if(foundBestMove) {
+        board -> doMove(bestMove, AI_side);
+        return bestMove;
+    }
+/*
+    else if (lastResort){
+        board -> doMove(lastResortMove, AI_side);
+        return lastResortMove;
+    }
+*/
+    else {
+        return nullptr;
+    }
+    
 }
+
+/***
+
+Psuedocode for algorithm
+
+the game state consists of the following information:
+Board calcBoard, Move *m, Side side
+
+long minimax_val(OthelloGameState s, int depth)
+{
+    if (depth == 0 or reached a final state)
+        return evaluation of s
+    else
+    {
+        if (it's AI turn to move)
+        {
+            for each valid move that AI can make from s
+            {
+                make that move on s yielding a state s'
+                search(s', depth - 1)
+            }
+            
+            return the maximum value returned from recursive search calls
+            stored in vector
+        }
+        else
+        {
+            for each valid move that opponent can make from s
+            {
+                make that move on s yielding a state s'
+                search(s', depth - 1)
+            }
+            
+            return the minimum value returned from recursive search calls
+            stored in vector
+        }
+    }
+}
+
+***/
+
+long Player::n_ply_minimax_AI_val(Board calcBoard, Move *m, Side side, int depth) {
+
+    if (depth == 0) {
+        return calcBoard.boardScore(side);
+
+    }
+
+    else {
+        if (side != AI_side) {
+            vector<Move> possMoves;
+            vector<long> vals;
+            long minVal = 10000000;
+
+            // find all possible moves for the opponent
+
+            for (int x = 0; x < 8; x++) {
+                for (int y = 0; y < 8; y++) {
+                    Move move(0,0);
+                    move.setX(x);
+                    move.setY(y);
+
+                    if (calcBoard.checkMove(&move, side)) {
+                        possMoves.push_back(move);
+                    }
+
+                }
+            }
+
+            for (vector<Move>::iterator it = possMoves.begin(); it != possMoves.end(); ++it) {
+                // copy the board
+                Board copy = calcBoard;
+                calcBoard.doMove(&(*it), side);
+                vals.push_back(n_ply_minimax_AI_val(calcBoard, &(*it), AI_side, depth - 1));
+                calcBoard = copy;
+            }
+
+            for (vector<long>::iterator it = vals.begin(); it != vals.end(); ++it) {
+                if (*it < minVal ) {
+                    minVal = *it;
+                }
+            }
+            return minVal;
+        }
+        else {
+            vector<Move> possMoves;
+            vector<long> vals;
+            long maxVal = -10000000;
+
+            // find all possible moves for the opponent
+            for (int x = 0; x < 8; x++) {
+                for (int y = 0; y < 8; y++) {
+                    Move move(0,0);
+                    move.setX(x);
+                    move.setY(y);
+                    if(calcBoard.checkMove(&move, side)) {
+                        possMoves.push_back(move);
+                    }
+                }
+            }
+            for (vector<Move>::iterator it = possMoves.begin(); it != possMoves.end(); ++it) {
+                // copy the board
+                Board copy = calcBoard;
+                calcBoard.doMove(&(*it), side);
+                vals.push_back(n_ply_minimax_AI_val(calcBoard, &(*it), opp_side, depth - 1));
+                calcBoard = copy;
+            }
+
+            for (vector<long>::iterator it = vals.begin(); it != vals.end(); ++it) {
+                if (*it > maxVal) {
+                    maxVal = *it;
+                }
+            }
+            return maxVal;
+
+        }
+    }
+
+
+ }
+
 
 /*
  * Compute the next move given the opponent's last move. Your AI is
@@ -238,10 +420,15 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      * process the opponent's opponents move before calculating your own move
      */
 
+    int minimaxDepth = 3;
+    // this can be changed to the desired value
+
     board -> doMove(opponentsMove, opp_side);
-    // Uncomment these next three lines, one at a time, to test the respective AI's:
+    // Uncomment these next four lines, one at a time, to test the respective AI's:
+
     // return random_AI();
     // return heuristic_AI();
-    return two_ply_minimax_AI();
-    // return n_ply_minimax_AI(5);
+    // return two_ply_minimax_AI();
+     return n_ply_minimax_AI(minimaxDepth);
+
 }
