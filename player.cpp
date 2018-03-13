@@ -73,12 +73,12 @@ Move *Player::heuristic_AI() {
                 if (next_score > max_score) {
                     max_score = next_score;
                     move = tmp_move;
-                } else {
-                    delete tmp_move;
                 }
 
                 delete next_board;
             }
+
+            delete tmp_move;
         }
     }
 
