@@ -11,16 +11,17 @@ class Player {
 
 private:
 	Board *board;
-	Side playerSide, oppoSide; 
+	Side AI_side, opp_side; 
 
 public:
     Player(Side side);
     ~Player();
 
     void change_board(Board *new_board);
-    Move *random_AI(Move *opponentsMove);
-    Move *heuristic_AI(Move *opponentsMove);
-    Move *minimax_AI(Move *opponentsMove);
+    Move *random_AI();
+    Move *heuristic_AI();
+    Move *two_ply_minimax_AI();
+    Move *n_ply_minimax_AI(int n);
     Move *doMove(Move *opponentsMove, int msLeft);
 
     // Flag to tell if the player is running within the test_minimax context

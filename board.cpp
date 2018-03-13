@@ -68,7 +68,7 @@ bool Board::hasMoves(Side side) {
 }
 
 
-int Board::boardScore(Move* m, Side side) {
+int Board::boardScore(Side side) {
 
     int score = playerCount(side) - oppoCount(side);
  /*   

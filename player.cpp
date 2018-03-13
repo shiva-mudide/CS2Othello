@@ -1,8 +1,5 @@
 #include "player.hpp"
 
-// Hi, my name is James.
-// Hi, my name is Shiva. 
-
 /*
  * Constructor for the player; initialize everything here. The side your AI is
  * on (BLACK or WHITE) is passed in as "side". The constructor must finish
@@ -11,11 +8,8 @@
 Player::Player(Side side) {
     // Will be set to true in test_minimax.cpp.
     testingMinimax = false;
-    playerSide = side;
-    oppoSide = (playerSide == BLACK ? WHITE : BLACK);
-
-
-
+    AI_side = side;
+    opp_side = (AI_side == BLACK ? WHITE : BLACK);
 
     /*
      * TODO: Do any initialization you need to do here (setting up the board,
@@ -43,162 +37,185 @@ void Player::change_board(Board *new_board) {
  * Implementation of a working AI that plays the first move it finds that is valid.
  */
 Move *Player::random_AI() {
-    Move *playerMove = new Move(0, 0);
-
-    for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 8; j++) {
-            playerMove -> setX(i);
-            playerMove -> setY(j);
-            if (board -> checkMove(playerMove, playerSide)) {
-                board -> doMove(playerMove, playerSide);
-                return playerMove;
+    for (int x = 0; x < 8; x++) {
+        for (int y = 0; y < 8; y++) {
+            Move *move = new Move(x, y);
+            if (board->checkMove(move, AI_side)) {
+                board->doMove(move, AI_side);
+                return move;
+            } else {
+                delete move;
             }
         }
 
     }
 
-    delete playerMove;
     return nullptr;
 }
 
 /*
  * Simple heuristic AI that is good enough to beat SimplePlayer. Plays the move that gets the
- * maximum score with only a depth level of 1.
+ * maximum score looking at only the current board (depth level = 1).
  */
 Move *Player::heuristic_AI() {
-    Move* playerMove = new Move(0, 0);
-    Move* tempMove = new Move(0,0);
-    int score = -1000;
-    bool changed = false;
+    Move *move = nullptr;
+    int max_score = -1000;
 
     for (int x = 0; x < 8; x++) {
         for (int y = 0; y < 8; y++) {
-            tempMove -> setX(x);
-            tempMove -> setY(y);
+            Move *tmp_move = new Move(x, y);
 
-            if (board -> checkMove(tempMove, playerSide)) {
-                changed = true;
+            if (board->checkMove(tmp_move, AI_side)) {
+                Board *next_board = board->copy();
+                next_board->doMove(tmp_move, AI_side);
+                int next_score = next_board->boardScore(AI_side);
 
-                Board* copyBoard = board -> copy();
-                copyBoard -> doMove(tempMove, playerSide);
-
-                if (copyBoard -> boardScore(tempMove, playerSide) > score) {
-                    score = copyBoard -> boardScore(tempMove, playerSide);
-                    playerMove -> setX(tempMove -> getX());
-                    playerMove -> setY(tempMove -> getY());
+                if (next_score > max_score) {
+                    max_score = next_score;
+                    move = tmp_move;
+                } else {
+                    delete tmp_move;
                 }
 
-                delete copyBoard;
+                delete next_board;
             }
         }
     }
 
-    if (changed == false) {
-        delete tempMove;
-        delete playerMove;
+    if (!move)
         return nullptr;
-    }
     
-    delete tempMove; 
-    board -> doMove(playerMove, playerSide);
-    return playerMove;
+    board->doMove(move, AI_side);
+    return move;
+}
+
+/*
+ * Given a vector, find the index of the min
+ */
+int min_index(vector<int> scores) {
+    if (scores.size() == 0) {
+        return -1;
+    }
+
+    int ind = 0;
+
+    for (int i = 1; i < scores.size(); i++) {
+        if (scores[i] < scores[ind]) {
+            ind = i;
+        }
+    }
+
+    return ind;
+}
+
+/*
+ * Given a vector, find the index of the max
+ */
+int max_index(vector<int> scores) {
+    if (scores.size() == 0) {
+        return -1;
+    }
+
+    int ind = 0;
+
+    for (int i = 1; i < scores.size(); i++) {
+        if (scores[i] > scores[ind]) {
+            ind = i;
+        }
+    }
+
+    return ind;
 }
 
 /*
  * Minimax AI that only goes to a depth level of 2s
  */
-Move *Player::minimax_AI() {
-    vector<Move *> firstMove;
+Move *Player::two_ply_minimax_AI() {
+    vector<Move *> moves;
 
     for (int x = 0; x < 8; x++) {
         for (int y = 0; y < 8; y++) {
-            Move *tmpMove = new Move(x, y);
+            Move *tmp_move = new Move(x, y);
 
-            if (board->checkMove(tmpMove, playerSide))
-                firstMove.push_back(tmpMove);
+            if (board->checkMove(tmp_move, AI_side))
+                moves.push_back(tmp_move);
             else
-                delete tmpMove;
+                delete tmp_move;
         }
     }
 
     // number of available moves after opponents move is performed
-    int num_moves = firstMove.size();
+    int num_moves = moves.size();
 
     // no moves availble, return nullptr
     if (num_moves == 0)
         return nullptr;
 
     // initialize vector to 1000
-    vector<int> minScore(num_moves, 1000);
+    vector<int> min_scores(num_moves, 1000);
 
     for (int i = 0; i < num_moves; i++) {
         // create a copy of the board and do the move
-        Board* copyBoard = board->copy();
-        copyBoard->doMove(firstMove[i], playerSide);
+        Board *next_board = board->copy();
+        next_board->doMove(moves[i], AI_side);
 
         // go through all the spaces, checking if there is a valid move there for the opponent
         for (int x = 0; x < 8; x++) {
             for (int y = 0; y < 8; y++) {
-                Move *tmpMove = new Move(x, y);
+                Move *tmp_move = new Move(x, y);
 
-                if (copyBoard->checkMove(tmpMove, oppoSide)) {
+                if (next_board->checkMove(tmp_move, opp_side)) {
                     // create another copy and perform the opponents move
-                    Board *copyCopyBoard = copyBoard->copy();
-                    copyCopyBoard->doMove(tmpMove, oppoSide);
+                    Board *next_next_board = next_board->copy();
+                    next_next_board->doMove(tmp_move, opp_side);
                     
-                    // find the minimum score if we choose to perfom move firstMove[i]
-                    if (copyCopyBoard->boardScore(tmpMove, oppoSide) < minScore[i]) {
-                        minScore[i] = copyCopyBoard->boardScore(tmpMove, oppoSide);
+                    // find the minimum score if we choose to perfom move moves[i]
+                    if (next_next_board->boardScore(opp_side) < min_scores[i]) {
+                        min_scores[i] = next_next_board->boardScore(opp_side);
                     }
 
-                    delete copyCopyBoard;
+                    delete next_next_board;
                 }
 
-                delete tmpMove;
+                delete tmp_move;
             }
         }
 
-        delete copyBoard;
+        delete next_board;
     }
 
-    int maxMinScoreIndex = 0;
-
-    // find index of maximum of the minimum scores
-    for (int i = 1; i < minScore.size(); i++) {
-        if (minScore[i] > minScore[maxMinScoreIndex]) {
-            maxMinScoreIndex = i;
-        }
-    }
+    int max_min_scores_index = max_index(min_scores);
 
     // delete all moves except the actual move to be performed
     for (int i = 0; i < num_moves; i++) {
-        if (i != maxMinScoreIndex) {
-            delete firstMove[i];
+        if (i != max_min_scores_index) {
+            delete moves[i];
         }
     }
 
-    board->doMove(firstMove[maxMinScoreIndex], playerSide);
-    return firstMove[maxMinScoreIndex];
+    board->doMove(moves[max_min_scores_index], AI_side);
+    return moves[max_min_scores_index];
 }
 
-// look ahead n moves to find the best move to do
+/*
+ * helper function: return the score given a board and move performed by side
+ */
+int get_score(Board *board, Move *move, Side side) {
+    board->doMove(move, side);
+    return board->boardScore(side);
+}
+
+/*
+ * look ahead n moves to find the best move to do
+ * if n is odd, the n-th move is the AI's turn
+ * if n is even, the n-th move is the opponent's turn
+ */
 Move *Player::n_ply_minimax_AI(int n) {
     // when n = 1, find the current best move on the board
     if (n == 1) {
-        vector<Move *> moves;
-
-        for (int x = 0; x < 8; x++) {
-            for (int y = 0; y < 8; y++) {
-                Move *tmpMove = new Move(x, y);
-
-                if (board->checkMove(tmpMove, playerSide))
-                    firstMove.push_back(tmpMove);
-                else
-                    delete tmpMove;
-            }
-        }
+        return heuristic_AI();
     }
-    
+
     return nullptr;
 }
 
@@ -221,9 +238,10 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      * process the opponent's opponents move before calculating your own move
      */
 
-    board -> doMove(opponentsMove, oppoSide);
+    board -> doMove(opponentsMove, opp_side);
     // Uncomment these next three lines, one at a time, to test the respective AI's:
     // return random_AI();
     // return heuristic_AI();
-    return minimax_AI();   
+    return two_ply_minimax_AI();
+    // return n_ply_minimax_AI(5);
 }

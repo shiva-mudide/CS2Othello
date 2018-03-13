@@ -23,7 +23,7 @@ public:
 
     bool isDone();
     bool hasMoves(Side side);
-    int boardScore(Move* m, Side side);
+    int boardScore(Side side);
     bool checkMove(Move *m, Side side);
     void doMove(Move *m, Side side);
     int playerCount(Side side);
