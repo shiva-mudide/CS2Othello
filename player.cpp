@@ -420,7 +420,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      * process the opponent's opponents move before calculating your own move
      */
 
-    int minimaxDepth = 3;
+    int minimaxDepth = 5;
     // this can be changed to the desired value
 
     board -> doMove(opponentsMove, opp_side);
