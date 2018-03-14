@@ -90,44 +90,6 @@ Move *Player::heuristic_AI() {
 }
 
 /*
- * Given a vector, find the index of the min
- */
-int min_index(vector<int> scores) {
-    if (scores.size() == 0) {
-        return -1;
-    }
-
-    int ind = 0;
-
-    for (int i = 1; i < scores.size(); i++) {
-        if (scores[i] < scores[ind]) {
-            ind = i;
-        }
-    }
-
-    return ind;
-}
-
-/*
- * Given a vector, find the index of the max
- */
-int max_index(vector<int> scores) {
-    if (scores.size() == 0) {
-        return -1;
-    }
-
-    int ind = 0;
-
-    for (int i = 1; i < scores.size(); i++) {
-        if (scores[i] > scores[ind]) {
-            ind = i;
-        }
-    }
-
-    return ind;
-}
-
-/*
  * Minimax AI that only goes to a depth level of 2s
  */
 Move *Player::two_ply_minimax_AI() {
@@ -184,7 +146,13 @@ Move *Player::two_ply_minimax_AI() {
         delete next_board;
     }
 
-    int max_min_scores_index = max_index(min_scores);
+    int max_min_scores_index = 0;
+
+    for (int i = 1; i < num_moves; i++) {
+        if (min_scores[i] > min_scores[max_min_scores_index]) {
+            max_min_scores_index = i;
+        }
+    }
 
     // delete all moves except the actual move to be performed
     for (int i = 0; i < num_moves; i++) {
@@ -321,85 +289,80 @@ long minimax_val(OthelloGameState s, int depth)
 ***/
 
 long Player::n_ply_minimax_AI_val(Board calcBoard, Move *m, Side side, int depth) {
-
     if (depth == 0) {
         return calcBoard.boardScore(side);
-
     }
 
-    else {
-        if (side != AI_side) {
-            vector<Move> possMoves;
-            vector<long> vals;
-            long minVal = 10000000;
+    if (side != AI_side) {
+        vector<Move> possMoves;
+        vector<long> vals;
+        long minVal = 10000000;
 
-            // find all possible moves for the opponent
+        // find all possible moves for the opponent
 
-            for (int x = 0; x < 8; x++) {
-                for (int y = 0; y < 8; y++) {
-                    Move move(0,0);
-                    move.setX(x);
-                    move.setY(y);
+        for (int x = 0; x < 8; x++) {
+            for (int y = 0; y < 8; y++) {
+                Move move(0,0);
+                move.setX(x);
+                move.setY(y);
 
-                    if (calcBoard.checkMove(&move, side)) {
-                        possMoves.push_back(move);
-                    }
-
+                if (calcBoard.checkMove(&move, side)) {
+                    possMoves.push_back(move);
                 }
-            }
 
-            for (vector<Move>::iterator it = possMoves.begin(); it != possMoves.end(); ++it) {
-                // copy the board
-                Board copy = calcBoard;
-                calcBoard.doMove(&(*it), side);
-                vals.push_back(n_ply_minimax_AI_val(calcBoard, &(*it), AI_side, depth - 1));
-                calcBoard = copy;
             }
-
-            for (vector<long>::iterator it = vals.begin(); it != vals.end(); ++it) {
-                if (*it < minVal ) {
-                    minVal = *it;
-                }
-            }
-            return minVal;
         }
-        else {
-            vector<Move> possMoves;
-            vector<long> vals;
-            long maxVal = -10000000;
 
-            // find all possible moves for the opponent
-            for (int x = 0; x < 8; x++) {
-                for (int y = 0; y < 8; y++) {
-                    Move move(0,0);
-                    move.setX(x);
-                    move.setY(y);
-                    if(calcBoard.checkMove(&move, side)) {
-                        possMoves.push_back(move);
-                    }
-                }
-            }
-            for (vector<Move>::iterator it = possMoves.begin(); it != possMoves.end(); ++it) {
-                // copy the board
-                Board copy = calcBoard;
-                calcBoard.doMove(&(*it), side);
-                vals.push_back(n_ply_minimax_AI_val(calcBoard, &(*it), opp_side, depth - 1));
-                calcBoard = copy;
-            }
-
-            for (vector<long>::iterator it = vals.begin(); it != vals.end(); ++it) {
-                if (*it > maxVal) {
-                    maxVal = *it;
-                }
-            }
-            return maxVal;
-
+        for (vector<Move>::iterator it = possMoves.begin(); it != possMoves.end(); ++it) {
+            // copy the board
+            Board copy = calcBoard;
+            calcBoard.doMove(&(*it), side);
+            vals.push_back(n_ply_minimax_AI_val(calcBoard, &(*it), AI_side, depth - 1));
+            calcBoard = copy;
         }
+
+        for (vector<long>::iterator it = vals.begin(); it != vals.end(); ++it) {
+            if (*it < minVal ) {
+                minVal = *it;
+            }
+        }
+        
+        return minVal;
+    } else {
+        vector<Move> possMoves;
+        vector<long> vals;
+        long maxVal = -10000000;
+
+        // find all possible moves for the opponent
+        for (int x = 0; x < 8; x++) {
+            for (int y = 0; y < 8; y++) {
+                Move move(0,0);
+                move.setX(x);
+                move.setY(y);
+
+                if(calcBoard.checkMove(&move, side)) {
+                    possMoves.push_back(move);
+                }
+            }
+        }
+
+        for (vector<Move>::iterator it = possMoves.begin(); it != possMoves.end(); ++it) {
+            // copy the board
+            Board copy = calcBoard;
+            calcBoard.doMove(&(*it), side);
+            vals.push_back(n_ply_minimax_AI_val(calcBoard, &(*it), opp_side, depth - 1));
+            calcBoard = copy;
+        }
+
+        for (vector<long>::iterator it = vals.begin(); it != vals.end(); ++it) {
+            if (*it > maxVal) {
+                maxVal = *it;
+            }
+        }
+        
+        return maxVal;
     }
-
-
- }
-
+}
 
 /*
  * Compute the next move given the opponent's last move. Your AI is
@@ -429,6 +392,6 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
     // return random_AI();
     // return heuristic_AI();
     // return two_ply_minimax_AI();
-     return n_ply_minimax_AI(minimaxDepth);
+    return n_ply_minimax_AI(minimaxDepth);
 
 }
